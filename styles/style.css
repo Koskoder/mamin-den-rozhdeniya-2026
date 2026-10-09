@@ -1,0 +1,613 @@
+/* ============================================
+   ПЕРЕМЕННЫЕ
+   ============================================ */
+:root {
+    --bg-color: #0d0d0f;
+    --gold: #d4af37;
+    --gold-soft: #e8c66a;
+    --text-color: #f5f5f5;
+    --font-title: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+    --slide-duration: 9.4s;
+    --reveal-duration: 1.8s;
+    /* Старт ухода: длительность слайда минус длительность ухода */
+    --hide-delay: calc(var(--slide-duration) - var(--reveal-duration));
+}
+
+/* ============================================
+   БАЗА
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-color);
+    font-family: var(--font-body);
+    color: var(--text-color);
+}
+
+/* ============================================
+   КОНТЕЙНЕР ШОУ
+   ============================================ */
+.show {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+    background: var(--bg-color);
+}
+
+/* ============================================
+   СЛАЙД
+   ============================================ */
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--bg-color);
+}
+
+.slide.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+/* ============================================
+   ВНУТРЕННЯЯ ОБЁРТКА
+   ============================================ */
+.slide-inner {
+    position: absolute;
+    inset: 0;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+.slide-inner::before {
+    display: none;
+}
+
+.slide-inner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: inherit;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+}
+
+/* Мягкий Ken Burns */
+.slide.active .slide-inner::after {
+    animation: kenburnsSoft var(--slide-duration) ease-in-out forwards;
+}
+
+@keyframes kenburnsSoft {
+    from { transform: scale(1.0); }
+    to   { transform: scale(1.03); }
+}
+
+/* ============================================
+   ЭФФЕКТЫ ПОЯВЛЕНИЯ + УХОДА
+   ============================================ */
+
+/* --- Слайд 1: без появления и без ухода --- */
+#slide-1 .slide-inner { animation: none; }
+#slide-1.active .slide-inner::after { animation: none; }
+
+/* --- Слайд 2: круг из центра --- */
+#slide-2 .slide-inner { clip-path: circle(0% at 50% 50%); }
+#slide-2.active .slide-inner {
+    animation:
+            revealCircle2 var(--reveal-duration) cubic-bezier(.55,0,.4,1) forwards,
+            hideCircle2   var(--reveal-duration) cubic-bezier(.55,0,.4,1) var(--hide-delay) forwards;
+}
+@keyframes revealCircle2 {
+    from { clip-path: circle(0% at 50% 50%); }
+    to   { clip-path: circle(100% at 50% 50%); }
+}
+@keyframes hideCircle2 {
+    from { clip-path: circle(100% at 50% 50%); }
+    to   { clip-path: circle(0% at 50% 50%); }
+}
+
+/* --- Слайд 3: диагональная шторка --- */
+#slide-3 .slide-inner { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
+#slide-3.active .slide-inner {
+    animation:
+            revealDiagonal3 var(--reveal-duration) cubic-bezier(.65,0,.35,1) forwards,
+            hideDiagonal3   var(--reveal-duration) cubic-bezier(.65,0,.35,1) var(--hide-delay) forwards;
+}
+@keyframes revealDiagonal3 {
+    from { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
+    to   { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+}
+@keyframes hideDiagonal3 {
+    from { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+    to   { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
+}
+
+/* --- Слайд 4: жалюзи --- */
+#slide-4 .slide-inner {
+    clip-path: polygon(
+            0 0%,   100% 0%,   100% 0%,   0 0%,
+            0 12.5%, 100% 12.5%, 100% 12.5%, 0 12.5%,
+            0 25%,  100% 25%,  100% 25%,  0 25%,
+            0 37.5%, 100% 37.5%, 100% 37.5%, 0 37.5%,
+            0 50%,  100% 50%,  100% 50%,  0 50%,
+            0 62.5%, 100% 62.5%, 100% 62.5%, 0 62.5%,
+            0 75%,  100% 75%,  100% 75%,  0 75%,
+            0 87.5%, 100% 87.5%, 100% 87.5%, 0 87.5%
+    );
+}
+#slide-4.active .slide-inner {
+    animation:
+            revealBlinds4 var(--reveal-duration) ease-out forwards,
+            hideBlinds4   var(--reveal-duration) ease-out var(--hide-delay) forwards;
+}
+@keyframes revealBlinds4 {
+    from {
+        clip-path: polygon(
+                0 0%,   100% 0%,   100% 0%,   0 0%,
+                0 12.5%, 100% 12.5%, 100% 12.5%, 0 12.5%,
+                0 25%,  100% 25%,  100% 25%,  0 25%,
+                0 37.5%, 100% 37.5%, 100% 37.5%, 0 37.5%,
+                0 50%,  100% 50%,  100% 50%,  0 50%,
+                0 62.5%, 100% 62.5%, 100% 62.5%, 0 62.5%,
+                0 75%,  100% 75%,  100% 75%,  0 75%,
+                0 87.5%, 100% 87.5%, 100% 87.5%, 0 87.5%
+        );
+    }
+    to {
+        clip-path: polygon(
+                0 0%,    100% 0%,    100% 12.5%, 0 12.5%,
+                0 12.5%, 100% 12.5%, 100% 25%,   0 25%,
+                0 25%,   100% 25%,   100% 37.5%, 0 37.5%,
+                0 37.5%, 100% 37.5%, 100% 50%,   0 50%,
+                0 50%,   100% 50%,   100% 62.5%, 0 62.5%,
+                0 62.5%, 100% 62.5%, 100% 75%,   0 75%,
+                0 75%,   100% 75%,   100% 87.5%, 0 87.5%,
+                0 87.5%, 100% 87.5%, 100% 100%,  0 100%
+        );
+    }
+}
+@keyframes hideBlinds4 {
+    from {
+        clip-path: polygon(
+                0 0%,    100% 0%,    100% 12.5%, 0 12.5%,
+                0 12.5%, 100% 12.5%, 100% 25%,   0 25%,
+                0 25%,   100% 25%,   100% 37.5%, 0 37.5%,
+                0 37.5%, 100% 37.5%, 100% 50%,   0 50%,
+                0 50%,   100% 50%,   100% 62.5%, 0 62.5%,
+                0 62.5%, 100% 62.5%, 100% 75%,   0 75%,
+                0 75%,   100% 75%,   100% 87.5%, 0 87.5%,
+                0 87.5%, 100% 87.5%, 100% 100%,  0 100%
+        );
+    }
+    to {
+        clip-path: polygon(
+                0 0%,   100% 0%,   100% 0%,   0 0%,
+                0 12.5%, 100% 12.5%, 100% 12.5%, 0 12.5%,
+                0 25%,  100% 25%,  100% 25%,  0 25%,
+                0 37.5%, 100% 37.5%, 100% 37.5%, 0 37.5%,
+                0 50%,  100% 50%,  100% 50%,  0 50%,
+                0 62.5%, 100% 62.5%, 100% 62.5%, 0 62.5%,
+                0 75%,  100% 75%,  100% 75%,  0 75%,
+                0 87.5%, 100% 87.5%, 100% 87.5%, 0 87.5%
+        );
+    }
+}
+
+/* --- Слайд 5: дверь --- */
+#slide-5 .slide-inner { clip-path: inset(0 50% 0 50%); }
+#slide-5.active .slide-inner {
+    animation:
+            revealDoor5 var(--reveal-duration) cubic-bezier(.65,0,.35,1) forwards,
+            hideDoor5   var(--reveal-duration) cubic-bezier(.65,0,.35,1) var(--hide-delay) forwards;
+}
+@keyframes revealDoor5 {
+    from { clip-path: inset(0 50% 0 50%); }
+    to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hideDoor5 {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(0 50% 0 50%); }
+}
+
+/* --- Слайд 6: ромб из центра --- */
+#slide-6 .slide-inner { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+#slide-6.active .slide-inner {
+    animation:
+            revealDiamond6 var(--reveal-duration) cubic-bezier(.55,0,.4,1) forwards,
+            hideDiamond6   var(--reveal-duration) cubic-bezier(.55,0,.4,1) var(--hide-delay) forwards;
+}
+@keyframes revealDiamond6 {
+    from { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+    to   { clip-path: polygon(50% -100%, 200% 50%, 50% 200%, -100% 50%); }
+}
+@keyframes hideDiamond6 {
+    from { clip-path: polygon(50% -100%, 200% 50%, 50% 200%, -100% 50%); }
+    to   { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+}
+
+/* --- Слайд 7: шторка сверху-вниз --- */
+#slide-7 .slide-inner { clip-path: inset(0 0 100% 0); }
+#slide-7.active .slide-inner {
+    animation:
+            revealCurtainTop7 var(--reveal-duration) cubic-bezier(.65,0,.35,1) forwards,
+            hideCurtainTop7   var(--reveal-duration) cubic-bezier(.65,0,.35,1) var(--hide-delay) forwards;
+}
+@keyframes revealCurtainTop7 {
+    from { clip-path: inset(0 0 100% 0); }
+    to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hideCurtainTop7 {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(0 0 100% 0); }
+}
+
+/* --- Слайд 8: сжатие по горизонтали --- */
+#slide-8 .slide-inner { transform: scaleX(0.05); }
+#slide-8.active .slide-inner {
+    animation:
+            revealSqueeze8 var(--reveal-duration) cubic-bezier(.65,0,.35,1) forwards,
+            hideSqueeze8   var(--reveal-duration) cubic-bezier(.65,0,.35,1) var(--hide-delay) forwards;
+}
+@keyframes revealSqueeze8 {
+    from { transform: scaleX(0.05); }
+    to   { transform: scaleX(1); }
+}
+@keyframes hideSqueeze8 {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0.05); }
+}
+
+/* --- Слайд 9: ромашка --- */
+#slide-9 .slide-inner {
+    clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%);
+}
+#slide-9.active .slide-inner {
+    animation:
+            revealDaisy9 var(--reveal-duration) cubic-bezier(.55,0,.4,1) forwards,
+            hideDaisy9   var(--reveal-duration) cubic-bezier(.55,0,.4,1) var(--hide-delay) forwards;
+}
+@keyframes revealDaisy9 {
+    from { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+    to   { clip-path: polygon(50% -50%, 150% 15%, 150% 50%, 150% 85%, 50% 150%, -50% 85%, -50% 50%, -50% 15%); }
+}
+@keyframes hideDaisy9 {
+    from { clip-path: polygon(50% -50%, 150% 15%, 150% 50%, 150% 85%, 50% 150%, -50% 85%, -50% 50%, -50% 15%); }
+    to   { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+}
+
+/* --- Слайд 10: шторка справа-налево --- */
+#slide-10 .slide-inner { clip-path: inset(0 0 0 100%); }
+#slide-10.active .slide-inner {
+    animation:
+            revealCurtainLeft10 var(--reveal-duration) cubic-bezier(.65,0,.35,1) forwards,
+            hideCurtainLeft10   var(--reveal-duration) cubic-bezier(.65,0,.35,1) var(--hide-delay) forwards;
+}
+@keyframes revealCurtainLeft10 {
+    from { clip-path: inset(0 0 0 100%); }
+    to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hideCurtainLeft10 {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(0 0 0 100%); }
+}
+
+/* --- Слайд 11: размытие-проявление --- */
+#slide-11 .slide-inner { filter: blur(30px) brightness(1.5); transform: scale(1.08); opacity: 0; }
+#slide-11.active .slide-inner {
+    animation:
+            revealBlur11 var(--reveal-duration) ease-out forwards,
+            hideBlur11   var(--reveal-duration) ease-out var(--hide-delay) forwards;
+}
+@keyframes revealBlur11 {
+    from { filter: blur(30px) brightness(1.5); transform: scale(1.08); opacity: 0; }
+    to   { filter: blur(0) brightness(1); transform: scale(1); opacity: 1; }
+}
+@keyframes hideBlur11 {
+    from { filter: blur(0) brightness(1); transform: scale(1); opacity: 1; }
+    to   { filter: blur(30px) brightness(1.5); transform: scale(1.08); opacity: 0; }
+}
+
+/* --- Слайд 12: шторка снизу-вверх --- */
+#slide-12 .slide-inner { clip-path: inset(100% 0 0 0); }
+#slide-12.active .slide-inner {
+    animation:
+            revealCurtainBottom12 var(--reveal-duration) cubic-bezier(.65,0,.35,1) forwards,
+            hideCurtainBottom12   var(--reveal-duration) cubic-bezier(.65,0,.35,1) var(--hide-delay) forwards;
+}
+@keyframes revealCurtainBottom12 {
+    from { clip-path: inset(100% 0 0 0); }
+    to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hideCurtainBottom12 {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(100% 0 0 0); }
+}
+
+/* --- Слайд 13: расширение по вертикали --- */
+#slide-13 .slide-inner { clip-path: inset(50% 0 50% 0); }
+#slide-13.active .slide-inner {
+    animation:
+            revealExpandV13 var(--reveal-duration) cubic-bezier(.65,0,.35,1) forwards,
+            hideExpandV13   var(--reveal-duration) cubic-bezier(.65,0,.35,1) var(--hide-delay) forwards;
+}
+@keyframes revealExpandV13 {
+    from { clip-path: inset(50% 0 50% 0); }
+    to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hideExpandV13 {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(50% 0 50% 0); }
+}
+
+/* --- Слайд 14: круг + лёгкое вращение --- */
+#slide-14 .slide-inner { clip-path: circle(0% at 50% 50%); }
+#slide-14.active .slide-inner {
+    animation:
+            revealCircle14 var(--reveal-duration) cubic-bezier(.5,0,.3,1) forwards,
+            hideCircle14   var(--reveal-duration) cubic-bezier(.5,0,.3,1) var(--hide-delay) forwards;
+}
+@keyframes revealCircle14 {
+    from { clip-path: circle(0% at 50% 50%); }
+    to   { clip-path: circle(100% at 50% 50%); }
+}
+@keyframes hideCircle14 {
+    from { clip-path: circle(100% at 50% 50%); }
+    to   { clip-path: circle(0% at 50% 50%); }
+}
+#slide-14.active .slide-inner::after {
+    animation: kenburnsSoft var(--slide-duration) ease-in-out forwards,
+    spin14 var(--slide-duration) ease-in-out forwards;
+}
+@keyframes spin14 {
+    from { transform: scale(1.0) rotate(0deg); }
+    to   { transform: scale(1.05) rotate(8deg); }
+}
+
+/* --- Слайд 15: квадрат из центра --- */
+#slide-15 .slide-inner { clip-path: inset(50% 50% 50% 50%); }
+#slide-15.active .slide-inner {
+    animation:
+            revealInset15 var(--reveal-duration) cubic-bezier(.55,0,.4,1) forwards,
+            hideInset15   var(--reveal-duration) cubic-bezier(.55,0,.4,1) var(--hide-delay) forwards;
+}
+@keyframes revealInset15 {
+    from { clip-path: inset(50% 50% 50% 50%); }
+    to   { clip-path: inset(0% 0% 0% 0%); }
+}
+@keyframes hideInset15 {
+    from { clip-path: inset(0% 0% 0% 0%); }
+    to   { clip-path: inset(50% 50% 50% 50%); }
+}
+
+/* --- Слайд 16: свечение-вспышка --- */
+#slide-16 .slide-inner { opacity: 0; filter: brightness(2.5); }
+#slide-16.active .slide-inner {
+    animation:
+            revealGlow16 var(--reveal-duration) ease-out forwards,
+            hideGlow16   var(--reveal-duration) ease-out var(--hide-delay) forwards;
+}
+@keyframes revealGlow16 {
+    from { opacity: 0; filter: brightness(2.5); }
+    to   { opacity: 1; filter: brightness(1); }
+}
+@keyframes hideGlow16 {
+    from { opacity: 1; filter: brightness(1); }
+    to   { opacity: 0; filter: brightness(2.5); }
+}
+
+/* --- Слайд 17: круговые лепестки (iris) --- */
+#slide-17 .slide-inner {
+    clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%);
+}
+#slide-17.active .slide-inner {
+    animation:
+            revealIris17 var(--reveal-duration) cubic-bezier(.55,0,.4,1) forwards,
+            hideIris17   var(--reveal-duration) cubic-bezier(.55,0,.4,1) var(--hide-delay) forwards;
+}
+@keyframes revealIris17 {
+    from { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+    to   { clip-path: polygon(50% -50%, 150% 25%, 150% 75%, 50% 150%, -50% 75%, -50% 25%); }
+}
+@keyframes hideIris17 {
+    from { clip-path: polygon(50% -50%, 150% 25%, 150% 75%, 50% 150%, -50% 75%, -50% 25%); }
+    to   { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+}
+
+/* --- Слайд 18: круг (другой тайминг) --- */
+#slide-18 .slide-inner { clip-path: circle(0% at 50% 50%); }
+#slide-18.active .slide-inner {
+    animation:
+            revealCircle18 var(--reveal-duration) cubic-bezier(.65,0,.3,1) forwards,
+            hideCircle18   var(--reveal-duration) cubic-bezier(.65,0,.3,1) var(--hide-delay) forwards;
+}
+@keyframes revealCircle18 {
+    from { clip-path: circle(0% at 50% 50%); }
+    to   { clip-path: circle(100% at 50% 50%); }
+}
+@keyframes hideCircle18 {
+    from { clip-path: circle(100% at 50% 50%); }
+    to   { clip-path: circle(0% at 50% 50%); }
+}
+
+/* --- Слайд 19: шторка справа-налево (другой тайминг) --- */
+#slide-19 .slide-inner { clip-path: inset(0 0 0 100%); }
+#slide-19.active .slide-inner {
+    animation:
+            revealCurtainLeft19 var(--reveal-duration) cubic-bezier(.55,0,.4,1) forwards,
+            hideCurtainLeft19   var(--reveal-duration) cubic-bezier(.55,0,.4,1) var(--hide-delay) forwards;
+}
+@keyframes revealCurtainLeft19 {
+    from { clip-path: inset(0 0 0 100%); }
+    to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hideCurtainLeft19 {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(0 0 0 100%); }
+}
+
+/* ============================================
+   ФИНАЛЬНЫЙ ТЕКСТОВЫЙ СЛАЙД
+   ============================================ */
+.slide-final {
+    background: radial-gradient(circle at center, #1a1a20 0%, #0d0d0f 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5vh 6vw;
+    transition: none;
+}
+
+.slide-final::before,
+.slide-final::after {
+    display: none;
+}
+
+.final-text {
+    max-width: 800px;
+    text-align: center;
+}
+
+.final-title {
+    font-family: var(--font-title);
+    font-size: clamp(28px, 5vw, 64px);
+    font-weight: 900;
+    color: var(--gold);
+    margin-bottom: 4vh;
+    letter-spacing: 1px;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.final-line {
+    font-size: clamp(14px, 1.8vw, 22px);
+    line-height: 1.6;
+    font-weight: 300;
+    margin-bottom: 3vh;
+    color: var(--text-color);
+    opacity: 0;
+    transform: translateY(15px);
+}
+
+.final-love {
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: clamp(20px, 3vw, 36px);
+    color: var(--gold-soft);
+    margin-top: 4vh;
+}
+
+.slide-final.active .final-title {
+    animation: fadeUp 1.2s ease-out 0s forwards;
+}
+.slide-final.active .final-line:nth-of-type(1) {
+    animation: fadeUp 1.2s ease-out 0.8s forwards;
+}
+.slide-final.active .final-line:nth-of-type(2) {
+    animation: fadeUp 1.2s ease-out 2.4s forwards;
+}
+.slide-final.active .final-line:nth-of-type(3) {
+    animation: fadeUp 1.2s ease-out 4.0s forwards;
+}
+.slide-final.active .final-love {
+    animation: fadeUp 1.4s ease-out 5.6s forwards;
+}
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   КНОПКА PLAY
+   ============================================ */
+.play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: rgba(13, 13, 15, 0.75);
+    color: var(--gold);
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.play-btn:hover {
+    background: var(--gold);
+    color: #0d0d0f;
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.play-btn svg {
+    width: 45%;
+    height: 45%;
+    margin-left: 6px;
+}
+
+.play-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5); }
+    50%      { box-shadow: 0 0 0 18px rgba(212, 175, 55, 0); }
+}
+
+/* ============================================
+   АДАПТИВ
+   ============================================ */
+@media (max-width: 600px) {
+    .play-btn {
+        width: 85px;
+        height: 85px;
+    }
+
+    .slide-final {
+        padding: 4vh 5vw;
+    }
+
+    .final-title {
+        margin-bottom: 3vh;
+    }
+
+    .final-line {
+        margin-bottom: 2.2vh;
+        line-height: 1.55;
+    }
+}
